@@ -58,8 +58,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :return: The Tensor for the last layer of output
     """
     # TODO: Implement function
-    conv_1x1=tf.layers.conv2d(vgg_layer7_out,num_classes,1,padding='same',
-                              kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    conv_1x1=tf.layers.conv2d(vgg_layer7_out,num_classes,1,padding='same')
    # output=tf.layers.conv2d_transpose(conv_1x1,num_classes, 4,2,padding='same',
      #                                 kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     trans_conv1=tf.layers.conv2d_transpose(conv_1x1,num_classes, 4,2,padding='same')
@@ -120,11 +119,14 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     # TODO: Implement function
     sess.run(tf.global_variables_initializer())
     for i  in range(epochs):
+        total = 0
+        n = 0
         for image,label in get_batches_fn(batch_size):
             _,loss=sess.run([train_op,cross_entropy_loss],feed_dict={input_image: image,correct_label: label,keep_prob: 0.5,
-                                                                     learning_rate: 0.0009})
-            print("Loss is" +str(loss))
-            print()
+            n += 1                                                         learning_rate: 0.0009})
+            total += loss
+        print("Epoch - {} Loss is - {}".format(i,total/n))
+            
                 
             
 tests.test_train_nn(train_nn)
@@ -133,7 +135,7 @@ tests.test_train_nn(train_nn)
 def run():
     num_classes = 2
     epochs=50
-    batch_size = 4
+    batch_size = 10
     image_shape = (160, 576)
     data_dir = './data'
     runs_dir = './runs'
